@@ -12,7 +12,7 @@ const searchBook = async () => {
     // Error Handle message 
     if (searchText === '') {
         document.getElementById('count').innerText = `
-        Please search Something!`;
+        Please Search Something!`;
         document.getElementById('books-container').textContent = '';
     }
     else {
@@ -32,7 +32,7 @@ const showBooks = (books) => {
     searchResult.textContent = '';
 
     document.getElementById('count').innerText = `
-       Total Result: ${books.length}
+    Book Found: ${books.length}
         `;
     // Error Handle result 
     if (books.length === 0) {
