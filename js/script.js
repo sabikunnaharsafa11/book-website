@@ -1,56 +1,66 @@
 
-const seachBook = () => {
+// preloader 
+const spin = param => {
+    document.getElementById('spinner').style.display = param;
+}
+// Load Data  
+const searchBook = async () => {
     const searchInput = document.getElementById('search-input');
     const searchText = searchInput.value;
+    // Clear Search Input 
     searchInput.value = '';
-
-
-    const url = `https://openlibrary.org/search.json?q=${searchText}`
-        fetch(url)
-            .then(res => res.json())
-            .then(data => displayData(data.docs))   
-
-}
-
-const displayData = data => {
-
-    // console.log(docsData)
-    const item = document.getElementById('item')
-    item.textContent = '';
-    data.slice(0, 12).forEach(e => {
-        const div = document.createElement('div');
-        div.classList.add('col');
-       div.innerHTML = `
-        <div class="card h-100">
-        <img id="img" src="https://covers.openlibrary.org/b/id/${e.cover_i}-M.jpg" class="card-img-top" alt="...">
-        <div class="card-body">
-            <h5 class="card-title">Book Name : ${e.title}</h5>
-            <p class="card-text">Author Name : ${e.author_name}</p>
-            <small class="text-muted">First Publish Year : ${e.first_publish_year}</small>
-        </div>
-      
-       `
-        item.appendChild(div);
-        // Search item Numbers
-      displayAllItem  (data.length,'block');
-
-    });
-
-    if (data.length === 0) {
-        const notFound = document.getElementById('not-found');
-        notFound.innerText = `Opps! No Result Found!!`
-
-    } else {
-        const notFound = document.getElementById('not-found');
-        notFound.style.display = 'none';
-
+    // Error Handle message 
+    if (searchText === '') {
+        document.getElementById('count').innerText = `
+        Please search Something!`;
+        document.getElementById('books-container').textContent = '';
+    }
+    else {
+        spin('block');
+        //API Url Dynamic 
+        const url = `https://openlibrary.org/search.json?q=${searchText}`
+        const res = await fetch(url);
+        const data = await res.json();
+        showBooks(data.docs);
+        
     }
 
 }
+const showBooks = (books) => {
+    const searchResult = document.getElementById('search-result');
+    // Clear Books Data 
+    searchResult.textContent = '';
 
-// search Items number
-const displayAllItem = (itemLength) =>{
-    const displayNumbers = document.getElementById('total-search-found');
-    displayNumbers.innerText = `Search Item Number : ( ${itemLength} )`;
-    displayNumbers.style.display = 'block';
-};
+    document.getElementById('count').innerText = `
+       Total Result: ${books.length}
+        `;
+    // Error Handle result 
+    if (books.length === 0) {
+        document.getElementById('count').innerText = `
+        No Result Found!! `;
+    }
+    else {
+        books.forEach(book => {
+            // Create Dynamically HTML Div
+            const div = document.createElement('div');
+            div.classList.add('col');
+            div.classList.add('card-style')
+            div.innerHTML = `
+                <div class="card">
+                    <img height= '350px' p-5 src="https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg" class="card-img-top" alt="...">
+                    <div class="card-body" style="height:200px; overflow:hidden">
+                        <h5 class="card-title"> <b>Book Name:</b> ${book.title}</h5>
+                        <p><b>Author Name:</b> ${book.author_name}</p>
+                        <p><b>Publisher:</b> ${book.publisher}</p>
+
+                        <p class="card-text"><b>Published year:</b> ${book.first_publish_year}</p>
+                    </div>
+                </div>
+            `;
+            searchResult.appendChild(div);
+        });
+
+    }
+    spin('none');
+
+}
